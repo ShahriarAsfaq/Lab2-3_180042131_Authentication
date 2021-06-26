@@ -1,14 +1,13 @@
 const express = require("express");
 const app = express();
-const userRoutes = require("./routes/userRoutes.routes");
+const userRoutes = require("./routes/userRoute.routes");
 const morgan = require("morgan");
 
-const { logger, printSomething } = require("./middlewares/app.middlewares");
 
-//app.use([logger, printSomething]);
 app.use(morgan("tiny"));
-app.use(express.static("public"));
+app.use(express.static("AdminLTE-master"));
 app.use(userRoutes);
+
 
 
 app.use((req, res) => {
