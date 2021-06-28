@@ -1,4 +1,4 @@
-/*const bcrypt = require("bcrypt-nodejs");
+const bcrypt = require("bcrypt-nodejs");
 const knex = require("knex");
 const postgres = knex({
   client: "pg",
@@ -6,9 +6,12 @@ const postgres = knex({
     host: "127.0.0.1",
     user: "postgres",
     password: "tahmid",
-    database: "Auth",
+    database: "auth",
   },
-});*/
+});
+postgres.select('*').from('users').then(data => {
+  console.log(data);
+});
 
 const isUser = (req, res, next) => {
     if (req.method == "POST") {
@@ -65,6 +68,12 @@ const isUser = (req, res, next) => {
       const Password = req.body.Password;
       const retypepassword = req.body.retypepassword;
       if (FullName!=""&&Email!=""&&Password!=""&&retypepassword!="") {
+        const hash = bcrypt.hashSync(Password);
+        postgres('users').insert({
+          email: Email,
+          fullname: FullName,
+          hash: hash 
+        }).then(console.log)
         next();
       } else {
         res.redirect("/register");
