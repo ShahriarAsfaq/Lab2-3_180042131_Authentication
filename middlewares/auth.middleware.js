@@ -13,11 +13,13 @@ postgres.select('*').from('users').then(data => {
   console.log(data);
 });
 
+const isloggedin=0;
+
 const isUser = (req, res, next) => {
     if (req.method == "POST") {
-     /* postgres
+      postgres
       .select("email", "hash")
-      .from("login")
+      .from("users")
       .where("email", "=", req.body.email)
       .then((data) => {
         const isValid = bcrypt.compareSync(req.body.password, data[0].hash);
@@ -29,16 +31,18 @@ const isUser = (req, res, next) => {
             .where("email", "=", req.body.email)
             .then((user) => {
               console.log(user[0].email);
-              res.status(200).json(user[0].email);
+              //res.status(200).send(user[0].fullname);
+              isloggedin=1;
+              next();
             })
-            .catch((err) => res.status(400).json("cant find user"));
-            next();
+            .catch((err) => res.status(400).send("cant find user"));
+            
         } 
         else {
-          res.status(400).json("wrong credential");
+          res.status(400).send("wrong credential");
         }
       })
-      .catch((err) => res.status(400).json("wrong credential"));
+      .catch((err) => res.status(400).send("wrong credential"));
      
      
      
@@ -59,7 +63,7 @@ const isUser = (req, res, next) => {
     
   };
   
-  module.exports = isUser;
+
 
   const isRegistretionOk = (req, res, next) => {
     if (req.method == "POST") {
@@ -69,12 +73,18 @@ const isUser = (req, res, next) => {
       const retypepassword = req.body.retypepassword;
       if (FullName!=""&&Email!=""&&Password!=""&&retypepassword!="") {
         const hash = bcrypt.hashSync(Password);
-        postgres('users').insert({
+        postgres('users')
+        .returning('*')
+        .insert({
           email: Email,
           fullname: FullName,
           hash: hash 
-        }).then(console.log)
-        next();
+        })
+        .then(response =>{
+          res.status(200);
+          next();
+        })
+        .catch((err) => res.status(400).send("registration error duplicate value"));
       } else {
         res.redirect("/register");
       }
@@ -83,4 +93,4 @@ const isUser = (req, res, next) => {
     }
   };
   
-  module.exports = isRegistretionOk;
+  module.exports = {isRegistretionOk, isUser, isloggedin};
