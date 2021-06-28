@@ -68,7 +68,8 @@ const isUser = (req, res, next) => {
       const Email = req.body.Email;
       const Password = req.body.Password;
       const retypePassword = req.body.retypePassword;
-      if (FullName!=""&&Email!=""&&Password!=""&&retypepassword!=""&&Password.length>=6&&Password===retypePassword) {
+      console.log(retypePassword);
+      if (FullName!=""&&Email!=""&&Password!=""&&retypePassword!=""&&Password.length>=6&&Password===retypePassword) {
         const hash = bcrypt.hashSync(Password);
         postgres('users')
         .returning('*')

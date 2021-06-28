@@ -36,7 +36,9 @@ router.post("/login",postLogin);
 //console.log(localStorage.getItem('localisloggedin'));
 
 router.get("/dashboard",islogin, getDashboard);
-router.get("/",islogin,getDashboard);
+router.get("/",(req,res)=>{
+  res.sendFile("login-v2.html", { root: "./AdminLTE-master/pages/examples" });
+});
 
 
 router.route("/register").all(isRegistretionOk).get(getRegister).post(postRegister);
