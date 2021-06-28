@@ -1,5 +1,8 @@
 const bcrypt = require("bcrypt-nodejs");
 const knex = require("knex");
+//let alert = require('alert');  
+
+
 const postgres = knex({
   client: "pg",
   connection: {
@@ -13,11 +16,11 @@ postgres.select('*').from('users').then(data => {
   console.log(data);
 });
 
-const isloggedin=0;
+let isloggedin=false;
 
 const isUser = (req, res, next) => {
     if (req.method == "POST") {
-      postgres
+     /* postgres
       .select("email", "hash")
       .from("users")
       .where("email", "=", req.body.email)
@@ -31,8 +34,12 @@ const isUser = (req, res, next) => {
             .where("email", "=", req.body.email)
             .then((user) => {
               console.log(user[0].email);
-              //res.status(200).send(user[0].fullname);
-              isloggedin=1;
+            
+              isloggedin=true;
+              localStorage.setItem('localisloggedin',isloggedin);
+              
+              alert("Welcome, "+user[0].fullname)
+              
               next();
             })
             .catch((err) => res.status(400).send("cant find user"));
@@ -43,18 +50,8 @@ const isUser = (req, res, next) => {
         }
       })
       .catch((err) => res.status(400).send("wrong credential"));
-     
-     
-     
-     
-     
-      /* const email = req.body.email;
-      const password = req.body.password;
-      if (email==true) {
-        next();
-      } else {
-        res.redirect("/login");
-      }*/
+     */
+    next();
     } 
     
     else {
@@ -70,8 +67,8 @@ const isUser = (req, res, next) => {
       const FullName = req.body.FullName;
       const Email = req.body.Email;
       const Password = req.body.Password;
-      const retypepassword = req.body.retypepassword;
-      if (FullName!=""&&Email!=""&&Password!=""&&retypepassword!="") {
+      const retypePassword = req.body.retypePassword;
+      if (FullName!=""&&Email!=""&&Password!=""&&retypepassword!=""&&Password.length>=6&&Password===retypePassword) {
         const hash = bcrypt.hashSync(Password);
         postgres('users')
         .returning('*')
@@ -93,4 +90,22 @@ const isUser = (req, res, next) => {
     }
   };
   
-  module.exports = {isRegistretionOk, isUser, isloggedin};
+const islogin=(req,res,next)=>{
+  const {
+    getislogin,
+    getRegister,
+    postRegister,
+    getLogin,
+    postLogin,
+    getDashboard
+  } = require("./../controllers/userController.controllers");
+    
+  if(getislogin()){
+    next();
+  } else {
+    res.redirect("/login");
+    next();
+  }
+};
+ 
+  module.exports = {isRegistretionOk, isUser, islogin};

@@ -1,10 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
+
+if (typeof localStorage === "undefined" || localStorage === null) {
+  var LocalStorage = require('node-localstorage').LocalStorage;
+  localStorage = new LocalStorage('./scratch');
+}
+
 const{
   isUser,
   isRegistretionOk,
-  isloggedin
+  islogin
 } = require("./../middlewares/auth.middleware");
 
 const {
@@ -14,6 +20,7 @@ const {
   postLogin,
   getDashboard
 } = require("./../controllers/userController.controllers");
+const { route } = require("../app");
 
 
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -22,13 +29,19 @@ router.use(bodyParser.json());
 
 router.get("/login",getLogin);
 router.get("/register",getRegister);
+router.post("/login",postLogin);
+/*const checklogin=(isloggedin)=>{
 
-if(isloggedin==1){
-router.get("/dashboard", getDashboard);
-} 
+};*/
+//console.log(localStorage.getItem('localisloggedin'));
+
+router.get("/dashboard",islogin, getDashboard);
+router.get("/",islogin,getDashboard);
 
 
 router.route("/register").all(isRegistretionOk).get(getRegister).post(postRegister);
-router.route("/login").all(isUser).get(getLogin).post(postLogin);
+
+
+
 
 module.exports = router;
